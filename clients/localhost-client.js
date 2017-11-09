@@ -63,6 +63,8 @@ var authenticate = (username, password) => {
 
 socket.on('testing', (payload) => console.log(payload));
 
+socket.on('chat',(payload)=> console.log(payload))
+
 socket.on('connect', () => {
   authenticate('peradetlic', 'qweqwe').then((userData) => {
     console.log(userData);

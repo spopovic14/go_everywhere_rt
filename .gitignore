@@ -66,3 +66,6 @@ typings/
 
 # VS Code settings
 .vscode/
+
+#Jetbrains Magic
+.idea/

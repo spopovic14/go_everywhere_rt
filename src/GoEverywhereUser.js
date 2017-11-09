@@ -35,6 +35,10 @@ class User {
     this.geSio.emit('testing', payload);
   }
 
+  test2(payload){
+	this.geSio.emit('chat',payload)
+  }
+  
   handleDisconnect() {
     this.geSio.on('disconnect', () => this.ogsSio.close());
     // TODO: additional cleanup?
@@ -48,9 +52,10 @@ class User {
     this.ogsSio.on('seekgraph/global', this.fooBar.bind(this));
     this.ogsSio.on('private-message', this.fooBar.bind(this));
 	//incoming chat requests handling
-	this.ogsSio.on('chat-message', this.fooBar.bind(this));
-	this.ogsSio.on('chat-part', this.fooBar.bind(this));
-	this.ogsSio.on('chat-join' , this.fooBar.bind(this));
+	this.ogsSio.on('chat-message', this.test2.bind(this)); //sent and recived messages go through this channel
+	this.ogsSio.on('chat-part', this.test2.bind(this));  // when another user joins any of the chat channels we will get notified
+	this.ogsSio.on('chat-join' , this.test2.bind(this)); // when another user joins any chat channel we will get notified
+    // when entering or leaving the chat channel we emit which channel is it
   }
 
   registerForChat(channel){
