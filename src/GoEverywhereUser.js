@@ -27,8 +27,8 @@ class User {
 	
     this.handleDisconnect();
     this.registerListeners();
-    this.mainLogic();
 	this.joinChats();
+    this.mainLogic();
   }
 
   fooBar(payload) {
@@ -53,16 +53,18 @@ class User {
 	this.ogsSio.on('chat-join' , this.fooBar.bind(this));
   }
 
-  joinChats(){
-	  //default channels that are joind on login
-	  this.joinedChats.forEach(registerForChat);
-  }
-  
   registerForChat(channel){
 	//here we register for individual chats
 	channel='global-'+channel;
-	this.ogsSio.emit('chat/join',{channel})
+	this.ogsSio.emit('chat/join',{channel});
   }
+  
+  joinChats(){
+	  //default channels that are joind on login
+	  this.joinedChats.forEach(this.registerForChat.bind(this));
+  }
+  
+
   
   mainLogic() {
     this.ogsSio.emit('hostinfo');
