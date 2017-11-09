@@ -21,10 +21,14 @@ class User {
     this.geSio = geSio;
     this.userData = userData;
     this.ogsSio = SocketIOClient(ogsUrl, ogsClientConfig);
-
+	
+	//default joined chats
+	this.joinedChats = ['german','spanish','lithuanian','norweigan','english','japanese','thai','vietnamese'];
+	
     this.handleDisconnect();
     this.registerListeners();
     this.mainLogic();
+	this.joinChats();
   }
 
   fooBar(payload) {
@@ -42,10 +46,24 @@ class User {
     this.ogsSio.on('net/pong', this.fooBar.bind(this));
     this.ogsSio.on('game', this.fooBar.bind(this));
     this.ogsSio.on('seekgraph/global', this.fooBar.bind(this));
-    this.ogsSio.on('chat-message', this.fooBar.bind(this));
     this.ogsSio.on('private-message', this.fooBar.bind(this));
+	//incoming chat requests handling
+	this.ogsSio.on('chat-message', this.fooBar.bind(this));
+	this.ogsSio.on('chat-part', this.fooBar.bind(this));
+	this.ogsSio.on('chat-join' , this.fooBar.bind(this));
   }
 
+  joinChats(){
+	  //default channels that are joind on login
+	  this.joinedChats.forEach(registerForChat);
+  }
+  
+  registerForChat(channel){
+	//here we register for individual chats
+	channel='global-'+channel;
+	this.ogsSio.emit('chat/join',{channel})
+  }
+  
   mainLogic() {
     this.ogsSio.emit('hostinfo');
 
@@ -73,9 +91,10 @@ class User {
       "player_id": this.userData.userId,
       "auth": this.userData.incidentAuth
     });
-    this.ogsSio.emit('chat/join', {
-      'channel': "global-english"
-    })
+    // this.ogsSio.emit('chat/join', {
+      // 'channel': "global-english"
+    // })
+	
     this.ogsSio.emit("ad", "supporter");
     this.ogsSio.emit("ad", "supporter");
     this.ogsSio.emit("seek_graph/connect", { 'channel': 'global' });
