@@ -26,7 +26,7 @@ class User {
     this.joinedChats = ['english', 'offtopic'];
 
     this.handleDisconnect();
-    this.registerListeners();
+    this.registerOGSListener();
     this.joinChats();
     this.mainLogic();
   }
@@ -46,7 +46,6 @@ class User {
       additionalInfo: {
         country: payload["country"],
         rating: payload["rating"]
-
       }
     }
 
@@ -56,7 +55,7 @@ class User {
       message: payload["message"] //TODO: message encoding
     }
 
-    this.ogsSio.emit('chat-message', geMessage);
+    this.geSio.emit('chat-message', geMessage);
 
   }
   test2(payload) {
@@ -64,12 +63,19 @@ class User {
   }
 
   handleDisconnect() {
-    this.geSio.on('disconnect', () => this.ogsSio.close()
-    );
+    this.geSio.on('disconnect', () => this.ogsSio.close());
     // TODO: additional cleanup?
   }
 
-  registerListeners() {
+  handlePrivateMessage(payload) {
+    this.geSio.emit('private-chat', payload);
+  }
+
+  handlePublicMessage(type, payload) {
+    this.geSio.emit('public-chat', { payload, type }); // TODO: unpack payload?
+  }
+
+  registerOGSListener() {
     this.ogsSio.on('active_game', this.fooBar.bind(this));
     this.ogsSio.on('notification', this.fooBar.bind(this));
     this.ogsSio.on('net/pong', this.fooBar.bind(this));
@@ -77,15 +83,22 @@ class User {
     this.ogsSio.on('seekgraph/global', this.fooBar.bind(this));
     this.ogsSio.on('private-message', this.fooBar.bind(this));
     //incoming chat requests handling
-    this.ogsSio.on('chat-message', this.handleIncomingChatMsg.bind(this)); //sent and recived messages go through this channel
-    this.ogsSio.on('chat-part', this.test2.bind(this));  // when another user joins any of the chat channels we will get notified
-    this.ogsSio.on('chat-join', this.test2.bind(this)); // when another user joins any chat channel we will get notified
+    this.ogsSio.on('chat-message', (payload) => this.handlePublicMessage('message', payload)); //sent and recived messages go through this channel
+    this.ogsSio.on('chat-part', (payload) => this.handlePublicMessage('leave', payload));  // when another user joins any of the chat channels we will get notified
+    this.ogsSio.on('chat-join', (payload) => this.handlePublicMessage('join', payload)); // when another user joins any chat channel we will get notified
     // when entering or leaving the chat channel we emit which channel is it
+
+  }
+
+  registerGEListeners() {
+    this.geSio.on('chat',
+      (payload) => this.ogsSio.emit('chat/send', { ...payload, uuid: generateUUID() })
+    );
   }
 
   registerForChat(channel) {
     //here we register for individual chats
-    channel = 'global-' + channel;
+    channel = 'global-' + channel; // FIXME
     this.ogsSio.emit('chat/join', { channel });
   }
 
