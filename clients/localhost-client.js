@@ -1,4 +1,4 @@
-const socket = require('socket.io-client')('http://localhost:3000');
+const socket = require('socket.io-client')('http://localhost:4700');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -56,18 +56,33 @@ var authenticate = (username, password) => {
       });
     });
   })
-    .catch((error) => {
-      console.log(error);
-    });
+      .catch((error) => {
+        console.log(error);
+      });
 }
 
-socket.on('testing', (payload) => console.log(payload));
+//socket.on('testing', (payload) => console.log(payload));
 
-socket.on('chat', (payload) => console.log(payload))
+//socket.on('chat', (payload) => console.log(payload))
+
+//socket.on('public-chat', (payload) => console.log(payload));
+
+socket.on('private-chat', (payload) => console.log(payload));
 
 socket.on('connect', () => {
   authenticate('peradetlic', 'qweqwe').then((userData) => {
     console.log(userData);
-    socket.emit('authenticate', userData)
+    socket.emit('authenticate', userData);
+
   });
 });
+/*var index= 4;
+setInterval(()=>{
+  socket.emit('private-chat', {
+    player_id: 483521,
+    username: 'VukBozovic',
+    uid: '1khy.'+index++,
+    message: 'Automatizovana poruka'
+  });
+  console.log('Poslao privatnu poruku');
+},5000);*/

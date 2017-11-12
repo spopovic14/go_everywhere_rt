@@ -1,7 +1,7 @@
 const SocketIOClient = require('socket.io-client');
 const generateUUID = require('uuid/v1');
 
-const ogsUrl = "https://online-go.com"
+const ogsUrl = "https://online-go.com";
 const ogsClientConfig = {
   reconnection: true,
   reconnectionDelay: 750,
@@ -38,7 +38,7 @@ class User {
   handleIncomingChatMsg(payload) {
 
     //converting into our specification
-    var geAccount = {
+    let geAccount = {
       server: "OGS",
       id: payload["id"],
       username: payload["username"],
@@ -47,17 +47,18 @@ class User {
         country: payload["country"],
         rating: payload["rating"]
       }
-    }
+    };
 
-    var geMessage = {
+    let geMessage = {
       from: geAccount,
       to: null,
       message: payload["message"] //TODO: message encoding
-    }
+    };
 
     this.geSio.emit('chat-message', geMessage);
 
   }
+
   test2(payload) {
     this.geSio.emit('chat', payload)
   }
@@ -72,7 +73,7 @@ class User {
   }
 
   handlePublicMessage(type, payload) {
-    this.geSio.emit('public-chat', { payload, type }); // TODO: unpack payload?
+    this.geSio.emit('public-chat', {payload, type}); // TODO: unpack payload?
   }
 
   registerOGSListener() {
@@ -87,19 +88,30 @@ class User {
     this.ogsSio.on('chat-part', (payload) => this.handlePublicMessage('leave', payload));  // when another user joins any of the chat channels we will get notified
     this.ogsSio.on('chat-join', (payload) => this.handlePublicMessage('join', payload)); // when another user joins any chat channel we will get notified
     // when entering or leaving the chat channel we emit which channel is it
-
+    //handling private chat
+    this.ogsSio.on('chat/pm', (payload) => this.handlePrivateMessage(payload));
+    this.ogsSio.on('private-message', (payload) => this.handlePrivateMessage(payload));
   }
 
   registerGEListeners() {
+
     this.geSio.on('chat',
-      (payload) => this.ogsSio.emit('chat/send', { ...payload, uuid: generateUUID() })
+        (payload) => this.ogsSio.emit('chat/send', {...payload, uuid: generateUUID()})
     );
+
+    this.geSio('private-chat', (payload) => {
+
+
+      thus.ogsSio.emit('chat/pm', payload);
+
+    });
+
   }
 
   registerForChat(channel) {
     //here we register for individual chats
     channel = 'global-' + channel; // FIXME
-    this.ogsSio.emit('chat/join', { channel });
+    this.ogsSio.emit('chat/join', {channel});
   }
 
   joinChats() {
@@ -111,8 +123,8 @@ class User {
   mainLogic() {
     this.ogsSio.emit('hostinfo');
 
-    this.ogsSio.emit('ui-pushes/subscribe', { channel: "announcements" });
-    this.ogsSio.emit('ui-pushes/subscribe', { channel: "undefined" });
+    this.ogsSio.emit('ui-pushes/subscribe', {channel: "announcements"});
+    this.ogsSio.emit('ui-pushes/subscribe', {channel: "undefined"});
     this.ogsSio.emit('notification/connect', {
       "player_id": this.userData.userId,
       "auth": this.userData.notificationAuth
@@ -141,7 +153,7 @@ class User {
 
     this.ogsSio.emit("ad", "supporter");
     this.ogsSio.emit("ad", "supporter");
-    this.ogsSio.emit("seek_graph/connect", { 'channel': 'global' });
+    this.ogsSio.emit("seek_graph/connect", {'channel': 'global'});
     return;
   }
 
