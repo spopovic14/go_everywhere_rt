@@ -27,6 +27,7 @@ class User {
 
     this.handleDisconnect();
     this.registerOGSListener();
+    this.registerGEListeners();
     this.joinChats();
     this.mainLogic();
   }
@@ -99,11 +100,11 @@ class User {
         (payload) => this.ogsSio.emit('chat/send', {...payload, uuid: generateUUID()})
     );
 
-    this.geSio('private-chat', (payload) => {
-
-
-      thus.ogsSio.emit('chat/pm', payload);
-
+    this.geSio.on('private-chat', (payload) => {
+      let message = {
+          ...payload,uid:'asd.1'
+      };
+      this.ogsSio.emit('chat/pm', message);
     });
 
   }
