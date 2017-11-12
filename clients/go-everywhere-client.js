@@ -78,11 +78,11 @@ var last_clock_drift = 0.0;
 var last_latency = 0.0;
 
 socket.on('net/pong', (data) => {
-    let now = Date.now();
-let latency = now - data.client;
-let drift = ((now - latency / 2) - data.server);
-last_latency = latency;
-last_clock_drift = drift;
+  let now = Date.now();
+  let latency = now - data.client;
+  let drift = ((now - latency / 2) - data.server);
+  last_latency = latency;
+  last_clock_drift = drift;
 });
 
 socket.on('event', log);

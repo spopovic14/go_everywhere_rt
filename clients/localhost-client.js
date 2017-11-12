@@ -6,7 +6,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var axios = require('axios');
-var qs = require('qs')
+var qs = require('qs');
 
 var request = function (method, uri, d = null, token = '') {
   if (!method) {
@@ -56,14 +56,14 @@ var authenticate = (username, password) => {
       });
     });
   })
-  .catch((error) => {
-    console.log(error);
-  });
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 socket.on('testing', (payload) => console.log(payload));
 
-socket.on('chat',(payload)=> console.log(payload))
+socket.on('chat', (payload) => console.log(payload))
 
 socket.on('connect', () => {
   authenticate('peradetlic', 'qweqwe').then((userData) => {
@@ -71,4 +71,3 @@ socket.on('connect', () => {
     socket.emit('authenticate', userData)
   });
 });
-
