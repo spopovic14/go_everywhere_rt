@@ -11,10 +11,9 @@ const ogsClientConfig = {
 };
 
 const handlePing = (socket) => {
-  socket.close();
+  // TODO: handle ping/pong with user latency/drift
 }
 
-// TODO: handle ping/pong with user latency/drift
 class User {
 
   constructor(geSio, userData) {
@@ -24,7 +23,7 @@ class User {
     this.ogsSio = SocketIOClient(ogsUrl, ogsClientConfig);
 
     //default joined chats
-    this.joinedChats = ['german', 'spanish', 'lithuanian', 'norweigan', 'english', 'japanese', 'thai', 'vietnamese'];
+    this.joinedChats = ['english', 'offtopic'];
 
     this.handleDisconnect();
     this.registerListeners();
