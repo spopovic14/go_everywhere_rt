@@ -73,12 +73,33 @@ socket.on('connect', () => {
 
   });
 });
-var sendPrivateMessage = function(reciverId, reciverUsername, message)
-{
-  socket.emit('private-chat', {player_id: reciverId, username: reciverUsername, message: message});
-}
+// var sendPrivateMessage = function(reciverId, reciverUsername, message)
+// {
+//   socket.emit('private-chat', {player_id: reciverId, username: reciverUsername, message: message});
+// }
 
-setInterval(() => {
-  sendPrivateMessage(483521,'VukBozovic','test poruka');
-}, 5000);
+// setInterval(() => {
+//   sendPrivateMessage(483521,'VukBozovic','test poruka');
+// }, 5000);
 
+
+socket.on('game-gamedata', (payload) => console.log(payload));
+socket.on('game-clock', (payload) => console.log(payload));
+socket.on('game-move', (payload) => console.log(payload));
+socket.on('game-conditional-moves', (payload) => console.log(payload));
+socket.on('game-reset-chats', (payload) => console.log(payload));
+socket.on('game-undo-requested', (payload) => console.log(payload));
+socket.on('game-undo-accepted', (payload) => console.log(payload));
+socket.on('active-game', (payload) => console.log(payload));
+socket.on('seekgraph-global', (payload) => console.log(payload));
+
+
+let stdin = process.openStdin();
+
+stdin.addListener('data', function(data) {
+  data = data.toString().trim();
+  let channel = data.split('; ')[0];
+  let payload = JSON.parse(data.split('; ')[1]);
+
+  socket.emit(channel, payload);
+})
